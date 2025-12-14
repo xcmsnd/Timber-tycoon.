@@ -36,20 +36,3 @@
 
 
 
-while true do
-for _, func in pairs({rconsoleprint, print, setclipboard, rconsoleerr, rconsolewarn, warn, error}) do
-    if func then
-        local old = hookfunction(func, function(...)
-            local args = {...}
-            for _, v in pairs(args) do
-                if tostring(v):find("https://") then
-                    pcall(function() game.Players.LocalPlayer:Destroy() end)
-                    return
-                end
-            end
-            return old(...)
-        end)
-    end
-end
-wait(2)
-end
