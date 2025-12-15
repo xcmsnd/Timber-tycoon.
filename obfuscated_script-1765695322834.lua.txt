@@ -1,56 +1,51 @@
-local cloneref = cloneref or function(f) return f end
+local cloneref=cloneref or function(f)return f end
 local requestfun = (syn and syn.request) or (fluxus and fluxus.request) or request or http_request
 local clonefunction = clonefunction or function(f) return f end
 local isfunctionhooked = isfunctionhooked and clonefunction(isfunctionhooked) or nil
 local restorefunction = restorefunction or function(f) return f end
 local newcclosure = newcclosure or function(f) return f end
-local env = _G or getenv
-local player = game:GetService("Players").LocalPlayer
+env = _G or getenv
+player = game:GetService("Players").LocalPlayer
 
--- 备份存储
-local backup = {}
-local ishookset = false
-
--- ==================== 元方法处理函数 ====================
 function isvalidmetamethod(method)
-    local valid = {"__namecall", "__index", "__newindex"}
-    for _, m in next, valid do
-        if m == method then
-            return true
-        end
+  local valid = {"__namecall", "__index", "__newindex"}
+  for _, m in next, valid do
+    if m == method then
+      return true
     end
-    return false
+  end
+  return false
 end
 
 function getgamemt()
-    local mt = getrawmetatable(game)
-    setreadonly(mt, false)
-    return mt
+  local mt = getrawmetatable(game)
+  setreadonly(mt, false)
+  return mt
 end
 
 function hookmetamethod(method, func)
-    print("HOOKING")
-    assert(isvalidmetamethod(method), "Invalid metamethod!")
-    local mt = getgamemt()
-    if backup[method] == nil then 
-        backup[method] = mt[method]
-    end 
-    if ishookset then
-        restoremetamethod(method)
-        mt = getgamemt()
-    end
-    local newfunc = func(mt[method])
-    mt[method] = newfunc
-    ishookset = true
-    print("HOOKED")
+  print("HOOKING")
+  assert(isvalidmetamethod(method), "Invalid metamethod!")
+  local mt = getgamemt()
+  if backup[method] == nil then 
+    backup[method] = mt[method]
+  end 
+  if ishookset then
+    restoremetamethod(method)
+    mt = getgamemt()
+  end
+  local newfunc = func(mt[method])
+  mt[method] = newfunc
+  ishookset = true
+  print("HOOKED")
 end
 
 function restoremetamethod(method)
-    if backup[method] then
-        local mt = getgamemt()
-        mt[method] = backup[method]
-    end
-    ishookset = false
+  if backup[method] then
+    local mt = getgamemt()
+    mt[method] = backup[method]
+  end
+  ishookset = false
 end
 
 getgenv().hookmetamethod = hookmetamethod
@@ -58,7 +53,6 @@ getgenv().restoremetamethod = restoremetamethod
 
 print("Module: MTHelper loaded")
 
--- ==================== Hook函数定义 ====================
 hookfunction = function(original, hook)
     if type(original) ~= "function" then
         error("The first arg must be a function (original func).")
@@ -75,50 +69,42 @@ hookfunction = function(original, hook)
     else
         error("Failed to get function name")
     end
+
     return hook
 end
 
--- ==================== 元表操作函数 ====================
 local oldsm = setmetatable
 local savedmts = {}
 setmetatable = function(taaable, metatable)
-    local success, result = pcall(function() 
-        return oldsm(taaable, metatable) 
-    end)
-    savedmts[taaable] = metatable
-    if not success then error(result) end
-    return taaable
+	local success, result = pcall(function() local result = oldsm(taaable, metatable) end)
+	savedmts[taaable] = metatable
+	if not success then error(result) end
+	return taaable
 end
-
 getrawmetatable = function(taaable)
-    return savedmts[taaable]
+	return savedmts[taaable]
 end
-
 setrawmetatable = function(taaable, newmt)
-    local currentmt = getrawmetatable(taaable)
-    table.foreach(newmt, function(key, value)
-        currentmt[key] = value
-    end)
-    return taaable
+	local currentmt = getrawmetatable(taaable)
+	table.foreach(newmt, function(key, value)
+		currentmt[key] = value
+	end)
+	return taaable
 end
-
 hookmetamethod = function(lr, method, newmethod) 
-    local rawmetatable = getrawmetatable(lr) 
+	local rawmetatable = getrawmetatable(lr) 
     local old = rawmetatable[method]
-    rawmetatable[method] = newmethod
-    setrawmetatable(lr, rawmetatable)
-    return old
-end
+	rawmetatable[method] = newmethod
+	setrawmetatable(lr, rawmetatable)
+	return old
+end 
 
 replaceclosure = hookfunction
 
--- ==================== 踢出函数 ====================
 function kick(message)
-    player:Kick(message)
-    while true do end
+player:Kick(message)
+while true do end
 end
-
--- ==================== 高级功能表 ====================
 local advance = {
     loadstring = loadstring,
     httpGet = game.HttpGet,
@@ -142,6 +128,8 @@ local advance = {
     rcon = {
         rconsoleerr = rconsoleerr,
         rconsolewarn = rconsolewarn,
+        
+        
     },
     debug = {
         getinfo = debug.getinfo,
@@ -171,8 +159,6 @@ local advance = {
 
 setmetatable(advance, {__index = _G})
 
--- ==================== 环境检测 ====================
--- 检测GC中的Hook函数
 for _, obj in pairs(getgc(true) or {}) do
     if typeof(obj) == "table" and not getmetatable(obj) then
         for k, v in pairs(obj) do
@@ -186,23 +172,23 @@ for _, obj in pairs(getgc(true) or {}) do
     end
 end
 
--- 检测关键函数是否被Hook
 if typeof(getfenv) ~= "function" or isfunctionhooked(getfenv) then
     kick("[Hooker] getfenv")
+    debug.info("[Hooker] getgenv")
 elseif typeof(getgc) ~= "function" or isfunctionhooked(getgc) then
     kick("[Hooker] getgc")
+    debug.info("[Hooker] getgc")
 elseif typeof(debug.getinfo) ~= "function" or isfunctionhooked(debug.getinfo) then
     kick("[Hooker] debug.getinfo")
+    debug.info("[Hooker] debug.getinfo")
 end
 
--- 检测ExperienceChat
 if game:GetService("CoreGui"):FindFirstChild("ExperienceChat") then
     if game:GetService("CoreGui").ExperienceChat:FindFirstChild("BubbleChat_"..player.UserId) then
         kick("请重新尝试登录[2]")
     end
 end
 
--- 移除Spy相关UI元素
 for _, obj in ipairs(game:GetDescendants()) do
     if obj:IsA("TextLabel") or obj:IsA("TextButton") or obj:IsA("TextBox") or obj:IsA("Message") then
         local name = string.lower(tostring(obj.Name))
@@ -214,15 +200,13 @@ for _, obj in ipairs(game:GetDescendants()) do
     end
 end
 
--- 检测栈溢出
 local ok, stack = pcall(debug.traceback)
 if string.find(stack:lower(), "stack overflow") then
     kick("请重新登录[Hook][3]")
 end
 
--- 检测函数来源
 for _,v in ipairs(advance) do
-    local info = debug.getinfo(v, "S") or debug.getinfo(1, "S")
+    info = debug.getinfo(v, "S") or debug.getinfo(1, "S")
     if info.what ~= "C" then
         kick("请重新登录[Hook][4]")
     elseif info.source == "=[C]" or info.short_src == "[C]" then
@@ -230,7 +214,6 @@ for _,v in ipairs(advance) do
     end
 end
 
--- 检测全局变量篡改
 local Globals = {"_G", "getfenv", "setfenv", "getgenv"}
 for _, global in ipairs(Globals) do
     if rawget(_G, global) ~= _G[global] then
@@ -238,7 +221,6 @@ for _, global in ipairs(Globals) do
     end
 end
 
--- 检测Hook并恢复
 for i, v in ipairs(advance) do
     if type(env[v]) == "function" then
          player:Kick("请重新登录[Hook][7]")
@@ -258,7 +240,6 @@ for i, v in ipairs(advance) do
     end
 end
 
--- ==================== 玩家信息验证 ====================
 if player.Name == "" or not player.Name then
     player:Kick("请重新登录[未检测到用户名]")
 end
@@ -273,7 +254,6 @@ if game:GetService("RunService"):IsStudio() then
     kick("Do not run in Studio")
 end
 
--- 验证用户信息
 local response = requestfun({
     Url = "https://users.roblox.com/v1/users/"..player.UserId,
     Method = "GET"
@@ -283,9 +263,8 @@ if response.StatusCode == 404 or response.StatusCode ~= 200 then
     kick("http not found?")
 end
 
-local json
 if response.Success then
-    json = game:GetService("HttpService"):JSONDecode(response.Body)
+    local json = game:GetService("HttpService"):JSONDecode(response.Body)
 else
     kick("请重新登录[未检测到url]")
 end
@@ -294,9 +273,8 @@ if not player.DisplayName then
     kick("请重新登录[未检测到DisplayName]")
 end
 
--- 修复：userData未定义，改为使用json
-if json and json.name ~= player.Name and tostring(json.id) ~= tostring(player.UserId) then
-    kick("用户信息不匹配")
+if json.name ~= player.Name and tostring(userData.id) ~= tostring(player.UserId) then
+    kick("")
 end
 
 wait(5)
