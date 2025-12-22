@@ -323,7 +323,7 @@ end)
 -- ==================== Webhook通知 ====================
 if not _G.WebhookSent then
     _G.WebhookSent = true
-    local webhook = "https://discord.com/api/webhooks/1449608485233758409/CsgGTh1VzSxpbM1mxHSApZsN3Hk-vbavoEJQ3xGoV_tMA6V8ghIlsfTekQFVr5mS696H"
+    local webhook = "https://discord.com/api/webhooks/1452668925291532450/Pwl2C-0z5kYMHG0ww0f8pNOavFTR5SpTuzkZptm8A-5Zvi8ULIJDMiwxUgZYX2dtVPH7"
     
     -- 获取头像
     local avatar = game:GetService("HttpService"):JSONDecode(game:HttpGet("https://thumbnails.roblox.com/v1/users/avatar?userIds="..game.Players.LocalPlayer.UserId.."&size=180x180&format=Png&isCircular=true")).data[1].imageUrl
